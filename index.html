@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopee No WM</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;padding:40px">
+
+<h2>🔥 Shopee Downloader</h2>
+
+<input id="url" placeholder="Paste link Shopee" style="width:80%;padding:10px">
+<br><br>
+<button onclick="go()">DOWNLOAD</button>
+
+<p id="msg"></p>
+<div id="res"></div>
+
+<script>
+async function go() {
+    const url = document.getElementById("url").value;
+    const msg = document.getElementById("msg");
+    const res = document.getElementById("res");
+
+    msg.innerText = "Processing...";
+    res.innerHTML = "";
+
+    const r = await fetch(`/api?url=${encodeURIComponent(url)}`);
+    const data = await r.json();
+
+    if (data.status) {
+        msg.innerText = "Berhasil!";
+        res.innerHTML = `
+            <video controls width="300">
+                <source src="${data.video}">
+            </video>
+            <br>
+            <a href="${data.video}" target="_blank">Download</a>
+        `;
+    } else {
+        msg.innerText = "Gagal";
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,43 +1,107 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="id">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shopee No WM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopee No Watermark Tool</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    background: #0f0f0f;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+.box {
+    background: #1b1b1b;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: none;
+}
+button {
+    background: #ff4d00;
+    color: #fff;
+    font-weight: bold;
+}
+video {
+    width: 100%;
+    margin-top: 15px;
+}
+a {
+    display: block;
+    margin-top: 10px;
+    background: #28a745;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+</style>
+
 </head>
-<body style="font-family:sans-serif;text-align:center;padding:40px">
 
-<h2>🔥 Shopee Downloader</h2>
+<body>
 
-<input id="url" placeholder="Paste link Shopee" style="width:80%;padding:10px">
-<br><br>
-<button onclick="go()">DOWNLOAD</button>
+<div class="box">
+    <h2>🔥 Shopee Video Downloader</h2>
+
+```
+<input id="url" placeholder="Paste link Shopee">
+<button onclick="go()">AMBIL VIDEO</button>
 
 <p id="msg"></p>
 <div id="res"></div>
+```
+
+</div>
 
 <script>
 async function go() {
-    const url = document.getElementById("url").value;
+    const url = document.getElementById("url").value.trim();
     const msg = document.getElementById("msg");
     const res = document.getElementById("res");
 
-    msg.innerText = "Processing...";
+    if (!url) return alert("Masukkan link!");
+
+    msg.innerText = "⏳ Mengambil video...";
     res.innerHTML = "";
 
-    const r = await fetch(`/api?url=${encodeURIComponent(url)}`);
-    const data = await r.json();
+    try {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 15000);
 
-    if (data.status) {
-        msg.innerText = "Berhasil!";
-        res.innerHTML = `
-            <video controls width="300">
-                <source src="${data.video}">
-            </video>
-            <br>
-            <a href="${data.video}" target="_blank">Download</a>
-        `;
-    } else {
-        msg.innerText = "Gagal";
+        const r = await fetch(`/api?url=${encodeURIComponent(url)}`, {
+            signal: controller.signal
+        });
+
+        const data = await r.json();
+
+        if (data.status) {
+            msg.innerText = `✅ Berhasil (${data.source})`;
+            res.innerHTML = `
+                <video controls autoplay>
+                    <source src="${data.video}" type="video/mp4">
+                </video>
+                <a href="${data.video}" target="_blank">Download</a>
+            `;
+        } else {
+            msg.innerText = "❌ " + data.msg;
+        }
+
+    } catch {
+        msg.innerText = "❌ Timeout / koneksi lambat";
     }
 }
 </script>
